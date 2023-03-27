@@ -1,6 +1,7 @@
 from pymongo.errors import OperationFailure
 
 from base.db_logical import ShardServerReplicaSet
+
 from demo.D00_init_server_setup import TOR_DC, WIN_DC, MON_DC, TOR_ROUTER
 
 # 1. Create two new replica sets, Manitoba and Quebec
@@ -38,6 +39,8 @@ print("Waiting for Quebec shard servers to come online...")
 QC_REPLSET.wait_until_healthy()
 print("  Shard servers have come online")
 
+# 2. Initiate the replica sets, and connect them to the routers
+
 print("Initiating Manitoba shard replica set...")
 try:
     output = MB_REPLSET.initiate_replica_set()
@@ -65,7 +68,3 @@ try:
         print("  Routers already connected to Quebec shard replica set")
 except OperationFailure as err:
     print("  Quebec shard replica set already initialized")
-
-# 2. Shard collection
-
-# TODO

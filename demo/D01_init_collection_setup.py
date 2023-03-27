@@ -6,7 +6,8 @@ COLLECTION_NAME: str = "weather"
 LOCATION_FIELD: str = "geolocation"
 TIMESTAMP_FIELD: str = "timestamp"
 
-collection = TOR_ROUTER.connect()\
+conn = TOR_ROUTER.connect()
+collection = conn\
     .get_database(DB_NAME)\
     .get_collection(COLLECTION_NAME)
 
@@ -26,4 +27,4 @@ print("Creating timestamp index")
 output = collection.create_index([(TIMESTAMP_FIELD, -1)])
 print(f"  Output: {output}")
 
-
+conn.close()

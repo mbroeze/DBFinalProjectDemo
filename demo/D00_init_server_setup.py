@@ -14,6 +14,7 @@ Sets up Mongo as follows:
 Notes
 - sharding is NOT enabled at this time
 - only one replica set (we add this later to demo scaling)
+- everything with a router takes a while
 """
 
 print("Creating sharded cluster (config servers, routers, shards)")

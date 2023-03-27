@@ -14,11 +14,11 @@ Data is simplified for the purposes of demonstration
 - the data is loaded using the Python REST API
 - the queries find the most recent data from the nearest weather station
     - based on timestamp/geolocation fields
-    - we add location/dateTime for readability 
+    - we add location/dateTime for readability
         - these fields have different values in the actual data
-- we use the Python REST API to search from the latitude/longitude 
+- we use the Python REST API to search from the latitude/longitude
     - CORNWALL/WINDSOR
-- expect that 
+- expect that
     - querying from WINDSOR returns TORONTO data
     - querying from CORNWALL returns OTTAWA data
 """
@@ -31,8 +31,25 @@ Demo notes
 """
 
 print_demo_title(1, "get the weather")
+
 insert_sample_data(detailed=True)
 
+"""
+fields of interest:
+- dateTime (placeholder) : TODAY/YESTERDAY
+    - no YESTERDAY is shown
+    - this query is based on timestamp
+- location (placeholder): OTTAWA/TORONTO
+    - CORNWALL is closer to OTTAWA
+    - WINDSOR is close to TORONTO
+    - this query is based on geolocation
+    - the distance between the query location and the weather station location:
+        - the calculated field distanceToWeatherStation
+        - calculated when the query finds the nearest weather station
+        - distance is in m
+        - geometry is NOT euclidean, but a 2d-sphere
+            - good approximation to earth's curvature
+"""
 query_from_windsor()
 query_from_cornwall()
 
@@ -42,8 +59,13 @@ clear_data()
 """
 Demo notes:
 - we bring two routers offline and verify the REST API still works
-- then bring down the router that was online, bring up one of the offline 
+- then bring down the router that was online, bring up one of the offline
 routers, and verify the REST API still works
+
+The REST API has connection urls to all of the routers
+- goes through each one and performs a health check
+    - checks server
+    - pings mongo instance running on the server
 """
 
 print_demo_title(2, "bringing down routers")
@@ -88,11 +110,12 @@ Demo Notes:
 - bring down another data server
     - confirm reads still work
 
-Note: Bringing down config servers is the same (replica set), so we won't bother
+Note: Bringing down config servers is the same (replica set)
 """
 print_demo_title(3, "bringing down data servers")
 
-print(f"Bringing down primary data server "
+
+print(f"Bringing down {ON_REPLSET.replica_set_name} primary data server "
       f"{ON_REPLSET.pref_primary.container_name}")
 ON_REPLSET.pref_primary.shutdown()
 while ON_REPLSET.pref_primary.healthy():
@@ -101,9 +124,6 @@ print("  Data server is down")
 input("Press enter to continue")
 
 insert_sample_data()
-
-print("Pausing for ")
-time.sleep(4)
 
 print(f"Bringing down Montreal data server")
 ON_REPL_MON.shutdown()
@@ -114,10 +134,19 @@ print("  Brought down Montreal data server")
 query_from_cornwall()
 query_from_windsor()
 
+"""
+Demo notes
+
+- we have 2/3 instances down
+    - the replica set will not have enough members to elect a PRIMARY
+    - the only instance up right now is a SECONDARY
+- we need to have a majority of instances up for writes to work
+"""
 print("Bringing up Montreal data server for writes")
 ON_REPL_MON.startup()
 while not ON_REPL_MON.healthy():
     time.sleep(1)
 print("  Montreal data server is up")
 input("Press enter to continue")
+
 clear_data()

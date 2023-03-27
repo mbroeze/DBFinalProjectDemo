@@ -145,7 +145,10 @@ class MongoShardServer(BaseMongoServer):
             ]
         }
         print(arg)
-        return self.connect().admin.command(cmd, arg)
+        conn = self.connect()
+        result = conn.admin.command(cmd, arg)
+        conn.close()
+        return result
 
 
 class MongoConfigServer(BaseMongoServer):
@@ -186,7 +189,10 @@ class MongoConfigServer(BaseMongoServer):
                 for idx, member in enumerate(members)
             ]
         }
-        return self.connect().admin.command(cmd, arg)
+        conn = self.connect()
+        result = conn.admin.command(cmd, arg)
+        conn.close()
+        return result
 
 
 class MongoRouter(BaseMongoServer):
@@ -216,12 +222,17 @@ class MongoRouter(BaseMongoServer):
         cmd: str = "addShard"
         arg: str = f"{shard_server.replica_set_name}" \
                    f"/{shard_server.container_name}:{shard_server.internal_port}"
-        return self.connect().admin.command(cmd, arg)
+        conn = self.connect()
+        result = conn.admin.command(cmd, arg)
+        conn.close()
+        return result
 
     def has_shard(self, shard_server: MongoShardServer) -> bool:
         cmd: str = "listShards"
         arg: int = 1
-        shard_data: dict = self.connect().admin.command(cmd, arg)
+        conn = self.connect()
+        shard_data: dict = conn.admin.command(cmd, arg)
+        conn.close()
         curr_shard_names: list[str] = [
             shard["_id"]
             for shard in shard_data["shards"]

@@ -13,16 +13,16 @@ OTTAWA_LOC: dict = {
     "lon": -75, "lat": 45
 }
 OTTAWA_GEOJSON: dict = {
-            "type": "Point",
-            "coordinates": [OTTAWA_LOC["lon"], OTTAWA_LOC["lat"]]
+    "type": "Point",
+    "coordinates": [OTTAWA_LOC["lon"], OTTAWA_LOC["lat"]]
 }
 
 TORONTO_LOC: dict = {
     "lon": -79, "lat": 45
 }
 TORONTO_GEOJSON: dict = {
-            "type": "Point",
-            "coordinates": [TORONTO_LOC["lon"], TORONTO_LOC["lat"]]
+    "type": "Point",
+    "coordinates": [TORONTO_LOC["lon"], TORONTO_LOC["lat"]]
 }
 
 TIME_FMT: str = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -96,11 +96,15 @@ def query_from_windsor():
 
 def clear_data():
     print("Deleting all sample data...")
-    collection = get_router().connect().get_database(DB_NAME) \
-            .get_collection(COLLECTION_NAME)
+    conn = get_router().connect()
+    collection = conn.get_database(DB_NAME) \
+        .get_collection(COLLECTION_NAME)
+
     for data in sample_data:
         collection.find_one_and_delete({"_id": data["_id"]})
         del data["_id"]
+
+    conn.close()
     print("  Data deleted")
 
 

@@ -30,5 +30,6 @@ async def post_weather(data: dict):
         "router": router.container_name,
         "_id": str(result.inserted_id)
     }
+
     return JSONResponse(content=jsonable_encoder(response))
 

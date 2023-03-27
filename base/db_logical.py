@@ -75,7 +75,7 @@ class ShardServerReplicaSet:
         return self.shard_servers
 
     def initiate_replica_set(self) -> dict:
-        return self.pref_primary.initiate_replica_set(
+        data: dict = self.pref_primary.initiate_replica_set(
             members=[
                 node for node in self.shard_servers
                 if node.container_name != self.pref_primary.container_name
